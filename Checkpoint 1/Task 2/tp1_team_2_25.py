@@ -9,7 +9,7 @@ Assignment Information:
     Assignment:     tp1 team 2
     Team ID:        LC5 - 25 (e.g. LC1 - 01; for section LC1, team 01)
     Author:         Tanmay Deshmukh, deshmu62@purdue.edu
-    Date:           10/06/2026
+    Date:           10/15/2026
 
 Contributors:
     Baron Chiang, chian163@purdue [repeat for each]
@@ -34,6 +34,7 @@ Academic Integrity Statement:
 from PIL import Image, ImageOps
 import numpy as np
 
+# Create mean kernel ensuring sum of all elements is 1 and size is kernel size * kernel size
 def create_mean_kernel(kernel_size):
     data_value = 1 / (kernel_size * kernel_size)
     kernel_matrix = np.full((kernel_size, kernel_size), data_value)
@@ -41,10 +42,11 @@ def create_mean_kernel(kernel_size):
 
 # Pad a resized image array to target_size (width, height)
 def pad_image(resized_img_array, target_size):
-    img = Image.fromarray(resized_img_array)
+    img = Image.fromarray(resized_img_array.astype(np.uint8))
     padded_img = ImageOps.pad(img, target_size, method=Image.BILINEAR)
     return np.array(padded_img)
 
+# Create a padded image and slide kernel over image
 def apply_kernel(image, kernel):
     H, W = image.shape
     h, w = kernel.shape
@@ -62,8 +64,9 @@ def apply_kernel(image, kernel):
     return R
 
 
-# Get user input, resize while keeping aspect ratio, pad, print shapes, and display
+# Make test image from ENGR website, input kernel size from user, call create_mean_kernel and apply_kernel functions, then display kernel and filtered images.
 def main():
+    np.set_printoptions(precision=6)
     test_image = np.zeros((5,5), dtype=np.uint8)
     test_image[2,2] = 255
     kernel_size = int(input("Enter kernel size: "))
@@ -71,8 +74,10 @@ def main():
     print("Kernel sum: 1.000000")
     kernel = create_mean_kernel(kernel_size)
     filtered = apply_kernel(test_image, kernel)
-    print("Kernel:\n", kernel)
-    print("Filtered Image:\n", np.round(filtered,6))
+    print("Kernel:")
+    print(kernel)
+    print("Filtered image:")
+    print(filtered)
 
 if __name__ == "__main__":
     main()
