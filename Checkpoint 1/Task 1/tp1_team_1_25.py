@@ -53,9 +53,9 @@ def rgb_to_hsv(r, g, b):
     elif c_max == r_p:
         h = (60 * (g_p - b_p) / delta) % 360
     elif c_max == g_p:
-        h = (60 * (b_p - r_p) / delta + 120) % 360
+        h = (60 * ((b_p - r_p) / delta + 2)) % 360
     elif c_max == b_p:
-        h = (60 * (r_p - g_p) / delta + 240) % 360
+        h = (60 * ((r_p - g_p) / delta + 4)) % 360
 
     # Equation 7.4
     if c_max == 0:
