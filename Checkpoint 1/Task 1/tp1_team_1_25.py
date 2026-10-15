@@ -12,7 +12,8 @@ Assignment Information:
     Date:           10/15/2026
 
 Contributors:
-    Name, login@purdue [repeat for each]
+    Tanmay Deshmukh, deshmu62@purdue.edu
+    Leo Cohen, cohen180@purdue.edu
 
     My contributor(s) helped me:
     [ ] understand the assignment expectations without
@@ -32,13 +33,103 @@ Academic Integrity Statement:
 """
 
 
+from PIL import Image, ImageOps
+import numpy as np
+import matplotlib.pyplot as plt
+
+
 def rgb_to_hsv(r, g, b):
-    r
+    # Equation 7.1
+    r_p, g_p, b_p = r/255.0, g/255.0, b/255.0
+
+    # Equation 7.2
+    c_max = max([r_p, g_p, b_p])
+    c_min = min([r_p, g_p, b_p])
+    delta = c_max - c_min
+
+    # Equation 7.3
+    if delta == 0:
+        h = 0
+    elif c_max == r_p:
+        h = (60 * (g_p - b_p) / delta) % 360
+    elif c_max == g_p:
+        h = (60 * (b_p - r_p) / delta + 120) % 360
+    elif c_max == b_p:
+        h = (60 * (r_p - g_p) / delta + 240) % 360
+
+    # Equation 7.4
+    if c_max == 0:
+        s = 0
+    else:
+        s = delta / c_max
+
+    # Equation 7.5
+    v = c_max
+
+    # Equation 7.6
+    h = h * (255.0 / 360.0)
+    s = s * 255
+    v = v * 255
+
+    return h, s, v
+
+
+def convert_to_hsv(rgb_image):
+    # Create blank array for the hsv image
+    hsv_image = np.zeros(rgb_image.shape, dtype=np.uint8)
+    # Loop through each row through the size of rgb_image
+    for row in range(len(rgb_image)):
+        # Loop through each column through the size of rgb_image
+        for col in range(len(rgb_image[row])):
+            # Get rgb values from the image at specific row and col
+            r, g, b = rgb_image[row][col]
+            # Get hsv values
+            h, s, v = rgb_to_hsv(r, g, b)
+            # Insert to hsv_image at row and col
+            hsv_image[row][col] = [int(h), int(s), int(v)]
+
+    return hsv_image
+
+
+# From Python 5 Team Task 3
+def load_img(file_dir):
+    image = Image.open(file_dir)
+    if image.mode != "L":
+        image = image.convert("RGB")
+    matrix = np.array(image) / 255.0
+    linear_array = np.where(matrix <= 0.04045, matrix / 12.92, ((matrix + 0.055) / 1.055) ** 2.4)
+    return linear_array
+
+# From Python 5 Team Task 3
+def resize_image(original_image_array, new_size):
+    img = Image.fromarray(original_image_array)
+    resized_img = img.resize(new_size, resample=Image.Resampling.BILINEAR)
+    return np.array(resized_img)
+
+# From Python 5 Team Task 3
+def pad_image(resized_img_array, target_size):
+    img = Image.fromarray(resized_img_array)
+    padded_img = ImageOps.pad(img, target_size)
+    return np.array(padded_img)
 
 
 def main():
-    """Write your code here (and delete this line)."""
-
+    img_dir = input("Enter the path of the RGB image you want to convert to hsv: ")
+    img = load_img(img_dir)
+    img = (img * 255).astype(np.uint8)
+    resized = resize_image(img, (100, 100))
+    padded = pad_image(resized, (100, 100))
+    coords = input("Enter the coordinates of the pixel you want inspect: ")
+    coords = coords.split(",")
+    coords[0], coords[1] = int(coords[0]), int(coords[1])
+    r, g, b = padded[coords[0]][coords[1]]
+    print(f"RGB values of the ({coords[0]}, {coords[1]}) pixel: R={r}, G={g}, B={b}")
+    print(f"Converting {img_dir} to HSV...")
+    h, s, v = rgb_to_hsv(r, g, b)
+    print(f"HSV values of the ({coords[0]}, {coords[1]}) pixel: H={int(h)}, S={int(s)}, V={int(v)}")
+    hsv_image = convert_to_hsv(padded)
+    plt.imshow(hsv_image, cmap="hsv")
+    plt.show()
 
 if __name__ == "__main__":
     main()
