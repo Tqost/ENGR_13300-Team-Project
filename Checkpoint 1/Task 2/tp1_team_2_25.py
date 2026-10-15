@@ -3,7 +3,7 @@ Course Number: ENGR 13300
 Semester: Fall 2026
 
 Description:
-    Resize images using the Pillow library while maintaining their aspect ratio to prevent distortion.
+    Kernel Sliding for Team Project 1
 
 Assignment Information:
     Assignment:     tp1 team 2
