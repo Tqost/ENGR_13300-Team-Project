@@ -40,7 +40,7 @@ import matplotlib.pyplot as plt
 
 def rgb_to_hsv(r, g, b):
     # Equation 7.1
-    r_p, g_p, b_p = r/255.0, g/255.0, b/255.0
+    r_p, g_p, b_p = r / 255.0, g / 255.0, b / 255.0
 
     # Equation 7.2
     c_max = max([r_p, g_p, b_p])
@@ -51,11 +51,11 @@ def rgb_to_hsv(r, g, b):
     if delta == 0:
         h = 0
     elif c_max == r_p:
-        h = (60 * (g_p - b_p) / delta) % 360
+        h = 60 * ((g_p - b_p) / delta)
     elif c_max == g_p:
-        h = (60 * ((b_p - r_p) / delta + 2)) % 360
+        h = 60 * (((b_p - r_p) / delta) + 2)
     elif c_max == b_p:
-        h = (60 * ((r_p - g_p) / delta + 4)) % 360
+        h = 60 * (((r_p - g_p) / delta) + 4)
 
     # Equation 7.4
     if c_max == 0:
@@ -68,8 +68,11 @@ def rgb_to_hsv(r, g, b):
 
     # Equation 7.6
     h = h * (255.0 / 360.0)
-    s = s * 255
-    v = v * 255
+    if h < 0.0:
+        h += 255.0
+        
+    s = s * 255.0
+    v = v * 255.0
 
     return h, s, v
 
