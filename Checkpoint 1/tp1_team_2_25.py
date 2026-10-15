@@ -39,13 +39,40 @@ def create_mean_kernel(kernel_size):
     kernel_matrix = np.full((kernel_size, kernel_size), data_value)
     return kernel_matrix
 
+# Pad a resized image array to target_size (width, height)
+def pad_image(resized_img_array, target_size):
+    img = Image.fromarray(resized_img_array)
+    padded_img = ImageOps.pad(img, target_size, method=Image.BILINEAR)
+    return np.array(padded_img)
+
 def apply_kernel(image, kernel):
-    pass
+    H, W = image.shape
+    h, w = kernel.shape
+    R = np.zeros((H,W))
+
+    target_size = (W + w - 1, H + h - 1)
+    padded = pad_image(image, target_size)
+
+
+    for j in range(H):
+        for i in range(W):
+            region = padded[j:j+h, i : i+w]
+            R[j, i] = np.sum(region * kernel)
+
+    return R
 
 
 # Get user input, resize while keeping aspect ratio, pad, print shapes, and display
 def main():
-    pass
+    test_image = np.zeros((5,5), dtype=np.uint8)
+    test_image[2,2] = 255
+    kernel_size = int(input("Enter kernel size: "))
+    print(f"Kernel size: {kernel_size}x{kernel_size}")
+    print("Kernel sum: 1.000000")
+    kernel = create_mean_kernel(kernel_size)
+    filtered = apply_kernel(test_image, kernel)
+    print("Kernel:\n", kernel)
+    print("Filtered Image:\n", np.round(filtered,6))
 
 if __name__ == "__main__":
     main()
