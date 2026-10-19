@@ -52,11 +52,11 @@ def rgb_to_hsv(r, g, b):
     if delta == 0:
         h = 0
     elif c_max == r_p:
-        h = 60 * ((g_p - b_p) / delta + 360) % 360
+        h = (60 * ((g_p - b_p) / delta) + 360) % 360
     elif c_max == g_p:
-        h = 60 * ((b_p - r_p) / delta + 120) % 360
+        h = (60 * ((b_p - r_p) / delta) + 120) % 360
     elif c_max == b_p:
-        h = 60 * ((r_p - g_p) / delta + 240) % 360
+        h = (60 * ((r_p - g_p) / delta) + 240) % 360
 
     # Equation 7.4
     if c_max == 0:
@@ -69,7 +69,6 @@ def rgb_to_hsv(r, g, b):
 
     # Equation 7.6
     r_h = float(h * (255.0 / 360.0))
-        
     r_s = float(s * 255.0)
     r_v = float(v * 255.0)
 
@@ -85,10 +84,11 @@ def convert_to_hsv(rgb_image):
         for col in range(len(rgb_image[row])):
             # Get rgb values from the image at specific row and col
             r, g, b = rgb_image[row][col]
-            # Get hsv values
-            h, s, v = rgb_to_hsv(r, g, b)
             # Insert to hsv_image at row and col
-            hsv_image[row][col] = [int(h), int(s), int(v)]
+            hsv_image[row][col] = rgb_to_hsv(r, g, b)
+
+    hsv_image = np.floor(hsv_image + 1e-9)
+    hsv_image = hsv_image.astype(np.uint8)
 
     return hsv_image
 
