@@ -36,6 +36,7 @@ Academic Integrity Statement:
 from PIL import Image, ImageOps
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 
 def rgb_to_hsv(r, g, b):
@@ -51,11 +52,11 @@ def rgb_to_hsv(r, g, b):
     if delta == 0:
         h = 0
     elif c_max == r_p:
-        h = 60 * ((g_p - b_p) / delta)
+        h = 60 * ((g_p - b_p) / delta + 360) % 360
     elif c_max == g_p:
-        h = 60 * (((b_p - r_p) / delta) + 2)
+        h = 60 * ((b_p - r_p) / delta + 120) % 360
     elif c_max == b_p:
-        h = 60 * (((r_p - g_p) / delta) + 4)
+        h = 60 * ((r_p - g_p) / delta + 240) % 360
 
     # Equation 7.4
     if c_max == 0:
@@ -67,14 +68,12 @@ def rgb_to_hsv(r, g, b):
     v = c_max
 
     # Equation 7.6
-    h = h * (255.0 / 360.0)
-    if h < 0.0:
-        h += 255.0
+    r_h = float(h * (255.0 / 360.0))
         
-    s = s * 255.0
-    v = v * 255.0
+    r_s = float(s * 255.0)
+    r_v = float(v * 255.0)
 
-    return h, s, v
+    return r_h, r_s, r_v
 
 
 def convert_to_hsv(rgb_image):
@@ -120,17 +119,27 @@ def main():
     img_dir = input("Enter the path of the RGB image you want to convert to hsv: ")
     img = load_img(img_dir)
     img = (img * 255).astype(np.uint8)
-    resized = resize_image(img, (100, 100))
-    padded = pad_image(resized, (100, 100))
+
+    target_size = (100, 100)
+    h, w = img.shape[:2]
+    if (w / h) > (target_size[0] / target_size[1]):
+        new_size = (target_size[0], math.ceil(target_size[0] * h / w))
+    else:
+        new_size = (math.ceil(target_size[1] * w / h), target_size[1])
+    resized = resize_image(img, new_size)
+    padded = pad_image(resized, target_size)
+
     coords = input("Enter the coordinates of the pixel you want inspect: ")
     coords = coords.split(",")
     coords[0], coords[1] = int(coords[0]), int(coords[1])
     r, g, b = padded[coords[0]][coords[1]]
+
     print(f"RGB values of the ({coords[0]}, {coords[1]}) pixel: R={r}, G={g}, B={b}")
     print(f"Converting {img_dir} to HSV...")
-    h, s, v = rgb_to_hsv(r, g, b)
-    print(f"HSV values of the ({coords[0]}, {coords[1]}) pixel: H={int(h)}, S={int(s)}, V={int(v)}")
     hsv_image = convert_to_hsv(padded)
+    h, s, v = hsv_image[coords[0], coords[1]]
+    print(f"HSV values of the ({coords[0]}, {coords[1]}) pixel: H={int(h)}, S={int(s)}, V={int(v)}")
+    
     plt.imshow(hsv_image, cmap="hsv")
     plt.show()
 
