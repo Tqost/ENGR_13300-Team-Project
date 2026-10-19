@@ -82,8 +82,7 @@ def convert_to_hsv(rgb_image):
             r, g, b = rgb_image[row][col]
             # Insert to hsv_image at row and col
             h, s, v = rgb_to_hsv(r, g, b)
-            hsv_image[row][col] = [int(h), int(s), int(v)]
-
+            hsv_image[row][col] = [int(h + 1e-9), int(s + 1e-9), int(v + 1e-9)]
     return hsv_image
 
 
