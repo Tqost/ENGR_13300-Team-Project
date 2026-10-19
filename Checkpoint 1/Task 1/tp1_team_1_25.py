@@ -3,7 +3,7 @@ Course Number: ENGR 13300
 Semester: Fall 2026
 
 Description:
-    Replace this line with a description of your program.
+    Convert image pixels from rgb to hsv
 
 Assignment Information:
     Assignment:     7.2.1 TP1 Team 1
