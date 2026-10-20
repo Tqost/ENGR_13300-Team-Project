@@ -42,9 +42,25 @@ def create_mean_kernel(kernel_size):
 
 # Pad a resized image array to target_size (width, height)
 def pad_image(resized_img_array, target_size):
-    img = Image.fromarray(resized_img_array.astype(np.uint8))
-    padded_img = ImageOps.pad(img, target_size, method=Image.BILINEAR)
-    return np.array(padded_img)
+    target_width, target_height = target_size
+    # Pad the image to the target size
+    resized_img = Image.fromarray(resized_img_array.astype(np.uint8))
+
+    if resized_img.mode != "L":
+        padded_img = ImageOps.pad(
+            resized_img,
+            (target_width, target_height),
+            Image.Resampling.BILINEAR,
+            (0, 0, 0)
+        )
+    else:
+        padded_img = ImageOps.pad(
+            resized_img,
+            (target_width, target_height),
+            Image.Resampling.BILINEAR,
+            0
+        )
+    return np.array(padded_img)  # Convert the padded image back to a numpy array
 
 # Create a padded image and slide kernel over image
 def apply_kernel(image, kernel):
