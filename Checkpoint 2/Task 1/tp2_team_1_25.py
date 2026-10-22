@@ -101,7 +101,7 @@ def sobel_filter(image):
     sobel_y = np.array([[-1, -2, -1], 
                         [0, 0, 0], 
                         [1, 2, 1]], dtype=float)
-    threshold = 50
+    threshold = 50.0
 
     # Pads image for sobel filtering and creates blank array.
     image = np.array(image, dtype=float)
@@ -130,13 +130,12 @@ def main():
     blur_image = gaussian_filter(grayscale_image, 1)
     sobel_image = sobel_filter(blur_image)
 
-    plt.figure()
     plt.imshow(sobel_image, cmap="gray", vmin=0, vmax=255)    
     plt.axis("off")
-    
+
+    plt.show()
     output_filename = "sobel_" + os.path.basename(file_dir)
     plt.imsave(output_filename, sobel_image, cmap="gray", vmin=0, vmax=255)
-    plt.show()
 
 
 if __name__ == "__main__":
