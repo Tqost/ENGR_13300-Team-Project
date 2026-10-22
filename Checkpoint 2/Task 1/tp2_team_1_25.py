@@ -3,7 +3,7 @@ Course Number: ENGR 13300
 Semester: Fall 2026
 
 Description:
-    Replace this line with a description of your program.
+    Detects edges in a grayscale image using a sobel filter, then 
 
 Assignment Information:
     Assignment:     8.2.1 TP2 Team 1
@@ -30,6 +30,7 @@ Academic Integrity Statement:
     another student access to my code.  The project I am
     submitting is my own original work.
 """
+
 import os
 
 import numpy as np
@@ -37,12 +38,12 @@ import matplotlib.pyplot as plt
 
 
 def load_img(file_path):
-    #Loads an image from the specified file path.
+    # Loads an image from the specified file path.
     return plt.imread(file_path)
 
 
 def rgb_to_grayscale(img):
-    #Converts an RGB image to grayscale.
+    # Converts an RGB image to grayscale.
     if np.issubdtype(img.dtype, np.floating):
         img = img * 255
     if len(img.shape) == 3 and img.shape[2] >= 3:
@@ -53,16 +54,17 @@ def rgb_to_grayscale(img):
 
 
 def create_gaussian_kernel(sigma):
-    #Creates a Gaussian kernel with the specified sigma.
+    # Creates a Gaussian kernel with the specified sigma.
     k_size = 2 * int(np.ceil(3 * sigma)) + 1
     pad = k_size // 2
 
     # Initialize the Gaussian kernel with zeros
+    coefficient = (1 / (2 * np.pi * (sigma**2)))
     kernel = np.zeros((k_size, k_size), dtype=float)
     for y in range(-pad, pad + 1):
         for x in range(-pad, pad + 1):
             exponent = -(x**2 + y**2) / (2 * (sigma**2))
-            kernel[y + pad, x + pad] = (1 / (2 * np.pi * (sigma**2))) * np.exp(exponent)
+            kernel[y + pad, x + pad] = coefficient * np.exp(exponent)
             
     # Normalize so sum equals 1.0
     kernel /= np.sum(kernel)
@@ -70,13 +72,13 @@ def create_gaussian_kernel(sigma):
 
 
 def gaussian_filter(image, sigma):
-    #Applies a Gaussian filter to the given image using the specified sigma.
+    # Applies a Gaussian filter to the given image using the specified sigma.
     kernel = create_gaussian_kernel(sigma)
     k_size = kernel.shape[0]
     pad_size = k_size // 2
     
     # Zero-pad the image
-    padded_image = np.pad(image, pad_size, mode='constant', constant_values=0)
+    padded_image = np.pad(image, pad_size, mode="constant", constant_values=0)
     output_image = np.zeros_like(image, dtype=float)
     
     img_h, img_w = image.shape
@@ -86,26 +88,28 @@ def gaussian_filter(image, sigma):
             window = padded_image[i:i + k_size, j:j + k_size]
             output_image[i, j] = np.sum(window * kernel)
             
-    # Clip the output image to the range [0, 255] and convert to 8-bit unsigned integer before returning.
+    # # Clip to [0, 255] and convert to 8-bit unsigned integer.
     return np.clip(output_image, 0, 255).astype(np.uint8)
 
 
 def sobel_filter(image):
-    SOBEL_X = np.array([[-1, 0, 1], 
+    sobel_x = np.array([[-1, 0, 1], 
                         [-2, 0, 2], 
-                        [-1, 0, 1]])
-    SOBEL_Y = np.array([[-1, -2, -1], 
+                        [-1, 0, 1]], dtype=float)
+    sobel_y = np.array([[-1, -2, -1], 
                         [0, 0, 0], 
-                        [1, 2, 1]])
+                        [1, 2, 1]], dtype=float)
     threshold = 50
-    padded_image = np.pad(image, 1, mode='constant', constant_values=0)
+    image = np.array(image, dtype=float)
+    padded_image = np.pad(image, 1, mode="constant", constant_values=0)
     sobel_image = np.zeros_like(image, dtype=float)
     img_h, img_w = image.shape
 
     for i in range(img_h):
         for j in range(img_w):
             window = padded_image[i:i + 3, j:j + 3]
-            gradient = np.sqrt(np.sum(window * SOBEL_X) ** 2 + np.sum(window * SOBEL_Y) ** 2)
+            gradient = np.sqrt(np.sum(window * sobel_x) ** 2 
+                               + np.sum(window * sobel_y) ** 2)
             if gradient > 255:
                 gradient = 255
             if gradient >= threshold:
@@ -122,11 +126,11 @@ def main():
     sobel_image = sobel_filter(blur_image)
 
     plt.figure()
-    plt.imshow(sobel_image, cmap='gray', vmin=0, vmax=255)    
-    plt.axis('off')
+    plt.imshow(sobel_image, cmap="gray", vmin=0, vmax=255)    
+    plt.axis("off")
     
     output_filename = "sobel_" + os.path.basename(file_dir)
-    plt.imsave(output_filename, sobel_image, cmap='gray', vmin=0, vmax=255)
+    plt.imsave(output_filename, sobel_image, cmap="gray", vmin=0, vmax=255)
     plt.show()
 
 
