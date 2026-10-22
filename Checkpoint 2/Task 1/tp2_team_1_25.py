@@ -12,7 +12,8 @@ Assignment Information:
     Date:           10/22/2026
 
 Contributors:
-    Name, login@purdue [repeat for each]
+    Tanmay Deshmukh, deshmu62@purdue.edu
+    Leo Cohen, cohen180@purdue.edu
 
     My contributor(s) helped me:
     [ ] understand the assignment expectations without
@@ -50,22 +51,22 @@ def load_img(file_dir):
     else:
         matrix = np.clip(matrix, 0.0, 1.0)
     
-    linear_array = np.where(matrix <= 0.04045, matrix / 12.92, (((matrix + 0.055) / 1.055) ** 2.4))
+    linear_array = np.where(matrix <= 0.04045, 
+                            matrix / 12.92, 
+                            (((matrix + 0.055) / 1.055) ** 2.4))
         
     return linear_array
 
 
 def rgb_to_grayscale(rgb_array):
     # Take each channel from rgb image array
-    red = rgb_array[:,:,0]
-    green = rgb_array[:,:,1]
-    blue = rgb_array[:,:,2]
-    
-    # Initialize and update grayscale array according to equation
-    grayscale_array = np.empty(rgb_array.shape[:2])
-    grayscale_array[:,:] =  red * 0.2126 + green * 0.7152 + blue * 0.0722
-    
-    # Return Grayscale Array
+    red = rgb_array[:, :, 0]
+    green = rgb_array[:, :, 1]
+    blue = rgb_array[:, :, 2]
+
+    # Direct weighted addition
+    grayscale_array = (red * 0.2126) + (green * 0.7152) + (blue * 0.0722)
+
     return grayscale_array * 255
 
 
@@ -111,12 +112,14 @@ def gaussian_filter(image, sigma):
 
 def sobel_filter(image):
     # Initializes sobel kernels and threshold value.
-    sobel_x = np.array([[-1, 0, 1], 
-                        [-2, 0, 2], 
-                        [-1, 0, 1]], dtype=float)
-    sobel_y = np.array([[-1, -2, -1], 
-                        [0, 0, 0], 
-                        [1, 2, 1]], dtype=float)
+    sobel_x = np.array([
+        [-1, 0, 1], 
+        [-2, 0, 2], 
+        [-1, 0, 1]], dtype=float)
+    sobel_y = np.array([
+        [-1, -2, -1], 
+        [0, 0, 0], 
+        [1, 2, 1]], dtype=float)
     threshold = 50.0
 
     # Pads image for sobel filtering and creates blank array.
