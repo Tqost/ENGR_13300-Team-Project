@@ -3,7 +3,7 @@ Course Number: ENGR 13300
 Semester: Fall 2026
 
 Description:
-    Detects edges in a grayscale image using a sobel filter, then 
+    Detects edges in a grayscale image using a sobel filter, then saves the sobel filter image.
 
 Assignment Information:
     Assignment:     8.2.1 TP2 Team 1
@@ -58,8 +58,9 @@ def create_gaussian_kernel(sigma):
     k_size = 2 * int(np.ceil(3 * sigma)) + 1
     pad = k_size // 2
 
-    # Initialize the Gaussian kernel with zeros
     coefficient = (1 / (2 * np.pi * (sigma**2)))
+    
+    # Initialize the Gaussian kernel with zeros
     kernel = np.zeros((k_size, k_size), dtype=float)
     for y in range(-pad, pad + 1):
         for x in range(-pad, pad + 1):
@@ -88,7 +89,7 @@ def gaussian_filter(image, sigma):
             window = padded_image[i:i + k_size, j:j + k_size]
             output_image[i, j] = np.sum(window * kernel)
             
-    # # Clip to [0, 255] and convert to 8-bit unsigned integer.
+    # Clip to [0, 255] and convert to 8-bit unsigned integer.
     return np.clip(output_image, 0, 255).astype(np.uint8)
 
 
