@@ -130,14 +130,14 @@ def main():
     blur_image = gaussian_filter(grayscale_image, 1)
     sobel_image = sobel_filter(blur_image)
 
-    plt.figure()
-    output_filename = "sobel_" + os.path.basename(file_dir)
-    plt.imsave(output_filename, sobel_image, cmap="gray", vmin=0, vmax=255)
-
     plt.imshow(sobel_image, cmap="gray", vmin=0, vmax=255)    
     plt.axis("off")
 
-    plt.show
+    plt.show()
+    output_filename = "sobel_" + os.path.basename(file_dir)
+    plt.imsave(output_filename, sobel_image, cmap="gray", vmin=0, vmax=255)
+
+
 
 
 if __name__ == "__main__":
