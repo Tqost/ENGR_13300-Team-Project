@@ -101,7 +101,7 @@ def sobel_filter(image):
     sobel_y = np.array([[-1, -2, -1], 
                         [0, 0, 0], 
                         [1, 2, 1]], dtype=float)
-    threshold = 50
+    threshold = 50.0
 
     # Pads image for sobel filtering and creates blank array.
     image = np.array(image, dtype=float)
