@@ -138,7 +138,5 @@ def main():
     plt.imsave(output_filename, sobel_image, cmap="gray", vmin=0, vmax=255)
 
 
-
-
 if __name__ == "__main__":
     main()
