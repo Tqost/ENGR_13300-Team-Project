@@ -131,12 +131,13 @@ def main():
     sobel_image = sobel_filter(blur_image)
 
     plt.figure()
-    plt.imshow(sobel_image, cmap="gray", vmin=0, vmax=255)    
-    plt.axis("off")
-    
     output_filename = "sobel_" + os.path.basename(file_dir)
     plt.imsave(output_filename, sobel_image, cmap="gray", vmin=0, vmax=255)
-    plt.show()
+
+    plt.imshow(sobel_image, cmap="gray", vmin=0, vmax=255)    
+    plt.axis("off")
+
+    plt.show
 
 
 if __name__ == "__main__":
