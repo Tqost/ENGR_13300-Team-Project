@@ -94,6 +94,7 @@ def gaussian_filter(image, sigma):
 
 
 def sobel_filter(image):
+    # Initializes sobel kernels and threshold value.
     sobel_x = np.array([[-1, 0, 1], 
                         [-2, 0, 2], 
                         [-1, 0, 1]], dtype=float)
@@ -101,11 +102,14 @@ def sobel_filter(image):
                         [0, 0, 0], 
                         [1, 2, 1]], dtype=float)
     threshold = 50
+
+    # Pads image for sobel filtering and creates blank array.
     image = np.array(image, dtype=float)
     padded_image = np.pad(image, 1, mode="constant", constant_values=0)
     sobel_image = np.zeros_like(image, dtype=float)
     img_h, img_w = image.shape
 
+    # Loops through each pixel and does sobel filtering.
     for i in range(img_h):
         for j in range(img_w):
             window = padded_image[i:i + 3, j:j + 3]
