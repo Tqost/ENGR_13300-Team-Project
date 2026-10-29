@@ -6,7 +6,7 @@ Description:
     This program creates a KNN machine learning algorithm.
 
 Assignment Information:
-    Assignment:     TP3 Team 1
+    Assignment:     9.1.1 TP3 Team 1
     Team ID:        LC5 - 25
     Author:         Baron Chiang, chian163@purdue.edu
     Date:           10/28/2026
