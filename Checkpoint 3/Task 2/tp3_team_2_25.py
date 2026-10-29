@@ -37,83 +37,92 @@ import pandas as pd
 
 
 def calculate_sigmoid(z):
-    z = np.clip(z, [-10, 10])
+    # Clip the input so that we don't get crazy sigmoid function outputs.
+    z = np.clip(z, -10, 10)
 
+    # Calculate sigmoid
     result = 1 / (1 + np.exp(-z))
 
     return result
 
 
 def predict_proba(X, w, b):
+    # Equation 9.7
     z = np.dot(X, w) + b
 
-    probabilities = np.zeros(X.shape)
-    for z_val in np.nditer(z):
-        probabilities[z_val] = calculate_sigmoid(z[z_val])
+    probabilities = calculate_sigmoid(z)
 
     return probabilities
 
 
-def predict_labels(X, w, b, threshold):
+def predict_labels(X, w, b, threshold=0.5):
+    # Get probability from X, w, and b values. 
     probability = predict_proba(X, w, b)
-    predicted_labels = np.zeros(probability.shape)
-    for proba in probability:
-        if proba > threshold:
-            predicted_labels[proba] = 1
-        else:
-            predicted_labels[proba] = 0
+
+    # Find where all of the probabilities are above the threshold and place as 1, otherwise place as 0.
+    predicted_labels = np.where(probability >= threshold, 1, 0)
 
     return predicted_labels
 
 
 def compute_loss_and_grads(X, y, w, b):
-    y_hat = predict_proba(X, w, b, 0.5)
+    # Calculate the probability and place in y_hat.
+    y_hat = predict_proba(X, w, b)
     loss = 0
-    for y_i in y_hat:
-        loss += 1 / X[0].shape * y_i * np.log(y_i) + (1 - y_i) * np.log(1 - y_i)
 
-    dw = 1 / X[0].shape * X * (y_hat - y)
-    db = 0
-    for i in y_hat:
-        db += 1 / X[0].shape * (y_hat[i] - y[i])
+    # Making sure that we do not get log(0) errors.
+    y_hat_clipped = np.clip(y_hat, 1e-15, 1 - 1e-15)
+
+    m = X.shape[0]
+
+    # Equation 9.5
+    loss = -np.mean(y * np.log(y_hat_clipped) + (1 - y) * np.log(1 - y_hat_clipped))
+
+    # Equations 9.8 and 9.9
+    dw = 1 / m * np.dot(X.T, (y_hat - y))
+    db = 1 / m * np.sum(y_hat - y)
 
     return loss, dw, db
 
 
 def train_logistic_regression(X_train, y_train, X_val, y_val, learning_rate, num_iterations):
+    # Getting randomized initial weights so we can break symmetry and initializing other variables needed.
     n_features = X_train.shape[1]
     w = np.random.randn(n_features) * 0.01
     b = 0.0
+
+    # Initializing the best of the weights, biases, and losses so we can find what is better. 
     w_best = w.copy()
-    b_best = b_best
+    b_best = b
     best_val_loss = float('inf')
 
     loss_history = []
     val_loss_history = []
 
-    print_interval = max(1, num_iterations // 10)
-
     for i in range(num_iterations):
         loss, dw, db = compute_loss_and_grads(X_train, y_train, w, b)
         loss_history.append(loss)
 
+        # Changing weights and biases by the change times learning_rate.
         w -= learning_rate * dw
         b -= learning_rate * db
 
         val_loss, _, _ = compute_loss_and_grads(X_val, y_val, w, b)
         val_loss_history.append(val_loss)
 
+        # Checking if the loss value is less than best, then make best equal to loss and get weight and bias from that iteration. 
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             w_best = w.copy()
             b_best = b
 
-        if i == 0 or (i) % print_interval == 0 or i == num_iterations:
-            print(f"Iteration {i}, Train Loss: {loss:.4f}, Val Loss: {best_val_loss:.4f}")
+        # Printing out where model is in training.
+        if i % 100 == 0:
+            print(f"Iteration {i}, Train Loss: {loss:.4f}, Val Loss: {val_loss:.4f}")
 
     return w_best, b_best, loss_history, val_loss_history
 
-
+# From checkpoint 3 task 1.
 def calculate_metrics(predicted_labels, true_labels):
     accuracy = float(np.mean(predicted_labels == true_labels))
 
@@ -123,6 +132,7 @@ def calculate_metrics(predicted_labels, true_labels):
 
 
 def evaluate_logistic_regression(X, y, w, b):
+    # Essentially calculating the accuracy and error of model when inputed with a table and weights and biases.
     predicted_labels = predict_labels(X, w, b, 0.5)
     accuracy, error = calculate_metrics(predicted_labels, y)
 
@@ -184,6 +194,12 @@ def main():
     shuffle = input("Shuffle the dataset? (yes/no): ")
     seed = int(input("Enter a seed for loading the dataset: "))
 
+    if shuffle == "yes":
+        shuffle = True
+    else:
+        shuffle = False
+    np.random.seed(seed)
+
     X, y = load_dataset(file_path, ["hue_mean", "hue_std", 
                                         "saturation_mean", "saturation_std", 
                                         "value_mean", "value_std", 
@@ -192,13 +208,39 @@ def main():
     (X_train, X_val, X_test,
         y_train, y_val, y_test) = train_val_test_split(X, y, 0.8, 0.1, 0.1)
 
-    print("\nData loaded and split into\n")
+    print(f"\nFeatures shape: {X.shape}")
+    print(f"Labels shape: {y.shape}")
+
+    print("Data loaded and split into\n")
     print("Training set:")
     print(f"  size: {X_train.shape[0]}")
     print("Validation set:")
     print(f"  size: {X_val.shape[0]}")
     print("Test set:")
     print(f"  size: {X_test.shape[0]}")
+
+    learning_rate = 0.01
+    num_iterations = 5000
+
+    print(f"\nTraining logistic regression model with learning rate = {learning_rate} and num_iterations = {num_iterations}...\n")
+
+    w_best, b_best, loss_history, val_loss_history = train_logistic_regression(X_train, y_train, X_val, y_val, learning_rate, num_iterations)
+    print("\nFinal Model Evaluation with the best parameters:")
+    print("--------------------------------------------------")
+    accuracy, error = evaluate_logistic_regression(X_train, y_train, w_best, b_best)
+    print(f"Training Set - Accuracy: {accuracy * 100:.2f}%, Error Rate: {error * 100:.2f}%")
+    accuracy, error = evaluate_logistic_regression(X_val, y_val, w_best, b_best)
+    print(f"Validation Set - Accuracy: {accuracy * 100:.2f}%, Error Rate: {error * 100:.2f}%")
+    accuracy, error = evaluate_logistic_regression(X_test, y_test, w_best, b_best)
+    print(f"Test Set - Accuracy: {accuracy * 100:.2f}%, Error Rate: {error * 100:.2f}%")
+
+    print("\nFinal Parameters:")
+    print(f"Weights shape: {w_best.shape}")
+    print(f"Bias: {b_best:.6f}")
+    print(f"Final training loss: {loss_history[-1]:.6f}")
+    print(f"\nFeature Importance (absolute weight values):")
+    for i, w in enumerate(w_best):
+        print(f"Feature {i}: {abs(w):.6f}")
 
 if __name__ == "__main__":
     main()
