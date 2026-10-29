@@ -34,6 +34,8 @@ Academic Integrity Statement:
 
 import numpy as np
 import pandas as pd
+from collections import Counter
+import matplotlib.pyplot as plt
 
 def evaluate_knn_model(k_values, X_train, y_train, X_val, y_val):
     #Evaluates the KNN classifier across multiple k values using training and validation sets.
@@ -101,3 +103,41 @@ def calculate_metrics(predicted_labels, true_labels):
 
     return accuracy, error
 
+def plot_knn_performance(metrics, k_values):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    
+    # Plot 1: Accuracy vs. k
+    ax1.plot(k_values, metrics["acc"]["train_acc"], marker='o', label='Training Accuracy')
+    ax1.plot(k_values, metrics["acc"]["val_acc"], marker='o', label='Validation Accuracy')
+    ax1.set_title('Accuracy vs. k')
+    ax1.set_xlabel('k')
+    ax1.set_ylabel('Accuracy')
+    ax1.legend()
+    ax1.grid(True)
+    
+    # Plot 2: Error Rate vs. k
+    ax2.plot(k_values, metrics["error"]["train_error"], marker='o', label='Training Error')
+    ax2.plot(k_values, metrics["error"]["val_error"], marker='o', label='Validation Error')
+    ax2.set_title('Error Rate vs. k')
+    ax2.set_xlabel('k')
+    ax2.set_ylabel('Error Rate')
+    ax2.legend()
+    ax2.grid(True)
+    
+    plt.tight_layout()
+    plt.savefig('train_val.png')
+    plt.close()
+
+    def select_best_k(metrics, k_values):
+        # Select the best k based on validation accuracy
+        val_acc = metrics["acc"]["val_acc"]
+        best_k_index = np.argmax(val_acc)
+        best_k = k_values[best_k_index]
+        return best_k
+
+
+    def evaluate_knn_test_set(X_train, y_train, X_test, y_test, best_k):
+        # Evaluate the KNN model on the test set using the best k
+        test_preds = predict_labels_knn(X_test, X_train, y_train, best_k)
+        test_accuracy, test_error = calculate_metrics(test_preds, y_test)
+        return test_accuracy, test_error 
