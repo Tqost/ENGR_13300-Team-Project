@@ -1,0 +1,75 @@
+"""
+Course Number: ENGR 13300
+Semester: Fall 2026
+
+Description:
+    
+
+Assignment Information:
+    Assignment:     9.1.2 TP3 Team 2
+    Team ID:        LC5 - 25
+    Author:         Leo Cohen, cohen180@purdue.edu
+    Date:           10/29/2026
+
+Contributors:
+    Tanmay Deshmukh, deshmu62@purdue.edu
+    Baron Chiang, chian163@purdue.edu
+    
+    My contributor(s) helped me:
+    [ ] understand the assignment expectations without
+        telling me how they will approach it.
+    [ ] understand different ways to think about a solution
+        without helping me plan my solution.
+    [ ] think through the meaning of a specific error or
+        bug present in my code without looking at my code.
+    Note that if you helped somebody else with their code, you
+    have to list that person as a contributor here as well.
+
+Academic Integrity Statement:
+    I have not used source code obtained from any unauthorized
+    source, either modified or unmodified; nor have I provided
+    another student access to my code.  The project I am
+    submitting is my own original work.
+"""
+
+import numpy as np
+import pandas as pd
+
+def knn_single_prediction(new_example, X_train, y_train, k):
+    # Calculate the distances from the training set to the new image.
+    distances = np.linalg.norm(X_train - new_example, axis=1)
+
+    # Place all of the distances and what the image is in a list of tuples.
+    dist_label_tuples = list(zip(distances, y_train))
+
+    # Sort by distance in ascending order.
+    dist_label_tuples.sort(key=lambda x: x[0])
+
+    # Get all of the nearest labels within k.
+    k_nearest_labels = [label for _, label in dist_label_tuples[:k]]
+
+    # Determine the most common label from a majority 
+    # vote in the list of k nearest labels.
+    most_common = Counter(k_nearest_labels).most_common(1)
+    predicted_label = np.int64(most_common[0][0])
+
+    return predicted_label
+
+def predict_labels_knn(X_new, X_train, y_train, k):
+    # Get dimension of the X_new array
+    n_new = X_new.shape[0]
+    predicted_labels = np.zeros(n_new, dtype=int)
+
+    # Go through each value within X_new and use the knn_single_prediction function. 
+    for i in range(n_new):
+        predicted_labels[i] = knn_single_prediction(X_new[i], X_train, y_train, k)
+
+    return predicted_labels
+
+def calculate_metrics(predicted_labels, true_labels):
+    accuracy = float(np.mean(predicted_labels == true_labels))
+
+    error = 1.0 - accuracy
+
+    return accuracy, error
+
