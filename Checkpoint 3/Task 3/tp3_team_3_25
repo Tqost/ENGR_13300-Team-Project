@@ -35,6 +35,34 @@ Academic Integrity Statement:
 import numpy as np
 import pandas as pd
 
+def evaluate_knn_model(k_values, X_train, y_train, X_val, y_val):
+    #Evaluates the KNN classifier across multiple k values using training and validation sets.
+    metrics = {
+        "acc": {"train_acc": [], "val_acc": []},
+        "error": {"train_error": [], "val_error": []}
+    }
+    
+    for k in k_values:
+        # Predict labels on the training and validation sets
+        train_preds = predict_labels_knn(X_train, y_train, X_train, k)
+        val_preds = predict_labels_knn(X_train, y_train, X_val, k)
+        
+        # Calculate metrics for training set
+        train_acc, train_error = calculate_metrics(y_train, train_preds)
+        
+        # Calculate metrics for validation set
+        val_acc, val_error = calculate_metrics(y_val, val_preds)
+        
+        # Append results to the appropriate lists in metrics
+        metrics["acc"]["train_acc"].append(train_acc)
+        metrics["acc"]["val_acc"].append(val_acc)
+        metrics["error"]["train_error"].append(train_error)
+        metrics["error"]["val_error"].append(val_error)
+        
+    return metrics
+
+
+
 def knn_single_prediction(new_example, X_train, y_train, k):
     # Calculate the distances from the training set to the new image.
     distances = np.linalg.norm(X_train - new_example, axis=1)
