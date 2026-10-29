@@ -155,7 +155,7 @@ def main():
     print(f"  size: {X_val.shape[0]}")
     print("Test set:")
     print(f"  size: {X_test.shape[0]}")
-    print(f"\nEvaluating KNN model on Training set with k = {k}...\n")
+    
     true_labels = y_train
     predicted_labels = predict_labels_knn(X_train, X_train, y_train, k)
     accuracy, error = calculate_metrics(predicted_labels, true_labels)
