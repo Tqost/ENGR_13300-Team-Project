@@ -3,7 +3,7 @@ Course Number: ENGR 13300
 Semester: Fall 2026
 
 Description:
-    Write code in python to create two functions, one to build a Gaussian kernel and one to apply it, then use them to blur a user-selected grayscale image
+    This program loads traffic sign images, measures their color and counts lines, circles and triangles in each one, and saves those 9 features to a CSV file
 Assignment Information:
     Assignment:     tp2 team 2
     Team ID:        LC5 - 25 
