@@ -3,7 +3,14 @@ Course Number: ENGR 13300
 Semester: Fall 2026
 
 Description:
-    
+    Loads the extracted image feature dataset, scales and optionally
+    shuffles it, and splits it into training, validation, and test sets.
+    Evaluates a K-nearest neighbors classifier across several k values,
+    plots the training and validation accuracy and error rates, and
+    selects the best k by validation accuracy. Trains a logistic
+    regression model with gradient descent, plots the training and
+    validation loss, and compares the accuracy of both models on the
+    validation and test sets.
 
 Assignment Information:
     Assignment:     9.1.2 TP3 Team 3
@@ -131,7 +138,7 @@ def plot_knn_performance(metrics, k_values):
     plt.savefig('train_val.png')
     plt.close()
 
-def select_best_k(metrics, k_values):
+def select_best_k(k_values, metrics):
     # Select the best k based on validation accuracy
     val_acc = metrics["acc"]["val_acc"]
     best_k_index = np.argmax(val_acc)
@@ -302,8 +309,6 @@ def main():
     shuffle = input("Shuffle the dataset? (yes/no): ").strip().lower() == "yes"
     seed = int(input("Enter a seed for loading the dataset: "))
 
-    np.random.seed(seed)  # reproducible weight initialization
-
     # Use the same column names you used in your 9.1.1 main (see the CSV header)
     feature_cols = ["hue_mean", "hue_std", "saturation_mean", "saturation_std",
                     "value_mean", "value_std", "number_lines", "has_circle",
@@ -311,13 +316,14 @@ def main():
     label_col = "ClassId"
 
     X, y = load_dataset(file_path, feature_cols, label_col, shuffle, seed)
+    np.random.seed(seed)  # reproducible weight initialization
     (X_train, X_val, X_test,
         y_train, y_val, y_test) = train_val_test_split(X, y, 0.8, 0.1, 0.1)
 
     print("\nData loaded and split into\n")
-    print(f"Training set:\nsize: {len(y_train)}")
-    print(f"Validation set:\nsize: {len(y_val)}")
-    print(f"Test set:\nsize: {len(y_test)}")
+    print(f"Training set:\n  size: {len(y_train)}")
+    print(f"Validation set:\n  size: {len(y_val)}")
+    print(f"Test set:\n  size: {len(y_test)}")
 
     # ----- KNN -----
     k_values = [1, 3, 5, 7, 9, 15, 31, 53]
@@ -329,7 +335,7 @@ def main():
         print(f"k = {k}: train accuracy = {knn_metrics['acc']['train_acc'][i]:.4f}, "
               f"validation accuracy = {knn_metrics['acc']['val_acc'][i]:.4f}")
 
-    best_k = select_best_k(knn_metrics, k_values)
+    best_k = select_best_k(k_values, knn_metrics)
     print(f"\nBased on the plots, the best k appears to be: {best_k}")
 
     knn_test_acc, knn_test_err = evaluate_knn_test_set(X_train, y_train, X_test, y_test, best_k)
