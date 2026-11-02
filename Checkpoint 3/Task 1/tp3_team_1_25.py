@@ -34,8 +34,6 @@ Academic Integrity Statement:
 
 import pandas as pd
 import numpy as np
-from collections import Counter
-
 
 # Function from Checkpoint 2 Task 3.
 def scale_features(df, features_cols):
@@ -103,8 +101,8 @@ def knn_single_prediction(new_example, X_train, y_train, k):
 
     # Determine the most common label from a majority 
     # vote in the list of k nearest labels.
-    most_common = Counter(k_nearest_labels).most_common(1)
-    predicted_label = np.int64(most_common[0][0])
+    most_common = np.bincount(k_nearest_labels)
+    predicted_label = np.argmax(most_common)
 
     return predicted_label
 
@@ -156,7 +154,7 @@ def main():
     print("Test set:")
     print(f"  size: {X_test.shape[0]}\n")
 
-    print(f"Evaluating KNN model on validation set with k = {k}...\n")
+    print(f"Evaluating KNN model on Training set with k = {k}...\n")
     true_labels = y_train
     predicted_labels = predict_labels_knn(X_train, X_train, y_train, k)
     accuracy, error = calculate_metrics(predicted_labels, true_labels)
