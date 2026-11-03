@@ -145,7 +145,6 @@ def select_best_k(k_values, metrics):
     best_k = k_values[best_k_index]
     return best_k
 
-
 def evaluate_knn_test_set(X_train, y_train, X_test, y_test, best_k):
     # Evaluate the KNN model on the test set using the best k
     test_preds = predict_labels_knn(X_test, X_train, y_train, best_k)
@@ -184,7 +183,6 @@ def evaluate_logistic_regression(X, y, w, b):
     accuracy, error = calculate_metrics(predicted_labels, y)
 
     return accuracy, error
-
 
 def evaluate_logistic_model(X_train, y_train, X_val, y_val, X_test, y_test, w, b):
     metrics = {
@@ -267,7 +265,6 @@ def load_dataset(file_path, feature_cols, label_col, shuffle, seed):
 
     return X, y
 
-
 def plot_logistic_training(loss_history, val_loss_history):
     plt.figure()
     plt.plot(loss_history, label="Training Loss")
@@ -301,8 +298,6 @@ def train_val_test_split(X, y, train_ratio, val_ratio, test_ratio):
     y_test = y[end_val:].astype(int)
 
     return X_train, X_val, X_test, y_train, y_val, y_test
-
-
 
 def main():
     file_path = input("Enter the path to the feature dataset: ")
